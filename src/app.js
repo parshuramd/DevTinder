@@ -1,21 +1,36 @@
 const express = require("express");
-
+const { adminAuth, userAuth } = require("./auth")
 const app = express();
 
-// Define routes
-app.get("/", (req, res) => {
-    res.send('home');
+
+app.use("/admin",adminAuth,(req,res)=>{
+    res.send("getting all data")
+})
+app.get("/user", (req, res) => {
+    res.send({ firstName: "Parshuram", lastName: "Dadas" });
 });
 
-app.get("/test", (req, res) => {
-    res.send('test');
-});
+app.post("/user", (req, res) => {
+    console.log(req.body);
+    res.send("user created successfully.")
+})
 
-app.get("/cypress", (req, res) => {
-    res.send('cypress');
-});
+app.patch("/user", (req, res) => {
+    res.send("user patched successfully");
+})
 
-// Start the server
+app.put("/user", (req, res) => {
+    res.send("user updated sucessfully");
+})
+
+app.delete("/user", (req, res, next) => {
+    // res.send("user deleted successfully")
+    next()
+}, (req, res) => {
+    res.send("deleted")
+})
+
+// Start the server 
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
