@@ -1,37 +1,35 @@
 const express = require("express");
-const { adminAuth, userAuth } = require("./auth")
+const { adminAuth, userAuth } = require("./middlewares/auth");
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
+const { use } = require("moongose/routes");
 
+app.post("/signup", (req, res) => {
+  const user = new User({
+    firstName: "Parshuram",
+    lastName: "Dadas",
+    email: "parshuram@dadas.com",
+    password: "Parshuram@123",
+  });
 
-app.use("/admin",adminAuth,(req,res)=>{
-    res.send("getting all data")
-})
-app.get("/user", (req, res) => {
-    res.send({ firstName: "Parshuram", lastName: "Dadas" });
+  try {
+    user.save();
+    res.send("User added to database");
+  } catch (err) {
+    res.status(400).send("error adding user to database");
+  }
 });
 
-app.post("/user", (req, res) => {
-    console.log(req.body);
-    res.send("user created successfully.")
-})
-
-app.patch("/user", (req, res) => {
-    res.send("user patched successfully");
-})
-
-app.put("/user", (req, res) => {
-    res.send("user updated sucessfully");
-})
-
-app.delete("/user", (req, res, next) => {
-    // res.send("user deleted successfully")
-    next()
-}, (req, res) => {
-    res.send("deleted")
-})
-
-// Start the server 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+connectDB()
+  .then(() => {
+    console.log("Connected Database");
+    // Start the server
+    const PORT = 3000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch(() => {
+    console.log("Database not connected");
+  });
